@@ -20,17 +20,25 @@ const Signup = () => {
     const errRef = useRef()
 
     const [signup, { isLoading }] = useSignupMutation();
-    const [username, setUsername] = useState({ value: '', isValid: false, isFocused: false })
-    const [password, setPassword] = useState({ value: '', isValid: false, isFocused: false })
-    const [matchPwd, setMatchPwd] = useState({ value: '', isValid: false, isFocused: false })
+    const [username, setUsername] = useState('');
+    const [usernameValid, setUsernameValid] = useState(false);
+    const [usernameFocused, setUsernameFocused] = useState(false);
+
+    const [password, setPassword] = useState('');
+    const [passwordValid, setPasswordValid] = useState(false);
+    const [passwordFocused, setPasswordFocused] = useState(false);
+
+    const [matchPwd, setMatchPwd] = useState('');
+    const [matchPwdValid, setMatchPwdValid] = useState(false);
+    const [matchPwdFocused, setMatchPwdFocused] = useState(false);
     const [errMsg, setErrMsg] = useState('');
 
     const handleSubmit = async e => {
         e.preventDefault()
         try {
-            await signup({ username: username.value, password: password.value }).unwrap()
-            setUsername({ value: '', isValid: false, isFocused: false })
-            setPassword({ value: '', isValid: false, isFocused: false })
+            await signup({ username, password }).unwrap()
+            setUsername(''); setUsernameValid(false); setUsernameFocused(false);
+            setPassword(''); setPasswordValid(false); setPasswordFocused(false);
             setErrMsg('')
             navigate('/login', { replace: true })
         } catch (err) {
@@ -48,12 +56,12 @@ const Signup = () => {
     }
 
     useEffect(() => { userRef.current.focus() }, [])
-    useEffect(() => { setUsername({ ...username, isValid: USER_REGEX.test(username.value) }) }, [username.value])
+    useEffect(() => { setUsernameValid(USER_REGEX.test(username)) }, [username])
     useEffect(() => {
-        setPassword({ ...password, isValid: PWD_REGEX.test(password.value) })
-        setMatchPwd({ ...matchPwd, isValid: password.value === matchPwd.value })
-    }, [password.value, matchPwd.value])
-    useEffect(() => { setErrMsg('') }, [username.value, password.value, matchPwd.value])
+        setPasswordValid(PWD_REGEX.test(password))
+        setMatchPwdValid(password === matchPwd)
+    }, [password, matchPwd])
+    useEffect(() => { setErrMsg('') }, [username, password, matchPwd])
     return (
         <section className="flex flex-col bg-white rounded-md p-8 shadow-lg shadow-lightTextDark/20 dark:bg-darkSecBg dark:shadow-black/30">
             <p ref={errRef} className={errMsg ? onscreen : offscreen} aria-live='assertive'>{errMsg}</p>
@@ -62,24 +70,24 @@ const Signup = () => {
                 <div className="flex flex-col gap-1">
                     <label htmlFor="username" className='flex items-center gap-2 text-lg text-lightTextLight capitalize dark:text-darkFilterText'>
                         username:
-                        <span className={`${username.isValid ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
-                        <span className={`${username.isValid || !username.value ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
+                        <span className={`${usernameValid ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
+                        <span className={`${usernameValid || !username ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
                     </label>
                     <input
                         type="text"
                         id="username"
                         ref={userRef}
                         autoComplete='off'
-                        value={username.value}
-                        onChange={e => setUsername({ ...username, value: e.target.value })}
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                         className={input}
                         required
-                        aria-invalid={username.isValid ? 'false' : 'true'}
+                        aria-invalid={usernameValid ? 'false' : 'true'}
                         aria-describedby='userNote'
-                        onFocus={() => setUsername({ ...username, isFocused: true })}
-                        onBlur={() => setUsername({ ...username, isFocused: false })}
+                        onFocus={() => setUsernameFocused(true)}
+                        onBlur={() => setUsernameFocused(false)}
                     />
-                    <div id='userNote' className={username.isFocused && username.value && !username.isValid ? instructions : offscreen}>
+                    <div id='userNote' className={usernameFocused && username && !usernameValid ? instructions : offscreen}>
                         <FaInfoCircle className='mt-[1px] text-lightTextLight dark:text-darkFilterText' />
                         <p className={instructionsText}>4 to 24 characters. Must begin with a letter. Letters, numbers, underscores and hyphens allowed.</p>
                     </div>
@@ -87,22 +95,22 @@ const Signup = () => {
                 <div className="flex flex-col gap-1">
                     <label htmlFor="password" className='flex items-center gap-2 text-lg text-lightTextLight capitalize dark:text-darkFilterText'>
                         password:
-                        <span className={`${password.isValid ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
-                        <span className={`${password.isValid || !password.value ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
+                        <span className={`${passwordValid ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
+                        <span className={`${passwordValid || !password ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
                     </label>
                     <input
                         type="password"
                         id="password"
-                        value={password.value}
-                        onChange={e => setPassword({ ...password, value: e.target.value })}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                         className={input}
                         required
-                        aria-invalid={password.isValid ? 'false' : 'true'}
+                        aria-invalid={passwordValid ? 'false' : 'true'}
                         aria-describedby='pwdNote'
-                        onFocus={() => setPassword({ ...password, isFocused: true })}
-                        onBlur={() => setPassword({ ...password, isFocused: false })}
+                        onFocus={() => setPasswordFocused(true)}
+                        onBlur={() => setPasswordFocused(false)}
                     />
-                    <div id='pwdNote' className={password.isFocused && password.value && !password.isValid ? instructions : offscreen}>
+                    <div id='pwdNote' className={passwordFocused && password && !passwordValid ? instructions : offscreen}>
                         <FaInfoCircle className='mt-[1px] text-lightTextLight dark:text-darkFilterText' />
                         <p className={instructionsText}>8 to 24 characters. Must include uppercase and lowercase letters, a number and a special character. Allowed special characters:
                             <span className='pl-1' aria-label='exclamation mark'>!</span>
@@ -119,28 +127,28 @@ const Signup = () => {
                 <div className="flex flex-col gap-1">
                     <label htmlFor="confirmPassword" className='flex items-center gap-2 text-lg text-lightTextLight capitalize dark:text-darkFilterText'>
                         confirm password:
-                        <span className={`${matchPwd.isValid && matchPwd.value ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
-                        <span className={`${matchPwd.isValid || !matchPwd.value ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
+                        <span className={`${matchPwdValid && matchPwd ? '' : 'hidden'} text-validGreen`}><FaCheck /></span>
+                        <span className={`${matchPwdValid || !matchPwd ? 'hidden' : ''} text-errorRedText`}><FaTimes /></span>
                     </label>
                     <input
                         type="password"
                         id="confirmPassword"
-                        value={matchPwd.value}
-                        onChange={e => setMatchPwd({ ...matchPwd, value: e.target.value })}
+                        value={matchPwd}
+                        onChange={e => setMatchPwd(e.target.value)}
                         className={input}
                         required
-                        aria-invalid={matchPwd.isValid ? 'false' : 'true'}
+                        aria-invalid={matchPwdValid ? 'false' : 'true'}
                         aria-describedby='confirmNote'
-                        onFocus={() => setMatchPwd({ ...matchPwd, isFocused: true })}
-                        onBlur={() => setMatchPwd({ ...matchPwd, isFocused: false })}
+                        onFocus={() => setMatchPwdFocused(true)}
+                        onBlur={() => setMatchPwdFocused(false)}
                     />
-                    <div id='confirmNote' className={matchPwd.isFocused && !matchPwd.value ? instructions : offscreen}>
+                    <div id='confirmNote' className={matchPwdFocused && !matchPwd ? instructions : offscreen}>
                         <FaInfoCircle className='mt-[1px] text-lightTextLight dark:text-darkFilterText' />
                         <p className={instructionsText}>Must match the first password input field</p>
                     </div>
                 </div>
                 <button
-                    disabled={!username.isValid && !password.isValid && !matchPwd.isValid}
+                    disabled={!usernameValid && !passwordValid && !matchPwdValid}
                     className='flex justify-center bg-transparent border border-brightBlue rounded-xl py-2 text-lg text-brightBlue font-medium tracking-wide capitalize shadow-md'
                 >{isLoading ? <ImSpinner9 className='animate-spin' /> : 'sign up'}</button>
                 <p className='text-lightTextLight capitalize dark:text-darkFilterText'>Already registered? <Link to='/login' className='underline'>sign in</Link></p>
