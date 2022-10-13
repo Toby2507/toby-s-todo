@@ -8,6 +8,8 @@ Toby's todo is a productivity app built with the MERN stack and TailwindCSS with
 - Express
 - Node.JS
 - React.JS
+- RTK
+- RTKQuery
 - Mongoose.JS
 - TailwindCSS
 
